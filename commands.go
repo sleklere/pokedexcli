@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func commandExit(param string, config *config) error {
+func commandExit(config *config, args ...string) error {
 	_, err := fmt.Println("Closing the Pokedex... Goodbye!")
 	if err != nil {
 		return err
@@ -15,7 +15,7 @@ func commandExit(param string, config *config) error {
 	return nil
 }
 
-func commandHelp(param string, config *config) error {
+func commandHelp(config *config, args ...string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
@@ -26,7 +26,7 @@ func commandHelp(param string, config *config) error {
 	return nil
 }
 
-func commandMapForward(param string, config *config) error {
+func commandMapForward(config *config, args ...string) error {
 	locationAreasRes, err := config.pokeApiClient.GetLocationAreas(config.nextLocationsURL)
 	if err != nil {
 		fmt.Printf("Error getting location areas: %v\n", err)
@@ -43,7 +43,7 @@ func commandMapForward(param string, config *config) error {
 	return nil
 }
 
-func commandMapBack(param string, config *config) error {
+func commandMapBack(config *config, args ...string) error {
 	if config.previousLocationsURL == nil {
 		fmt.Println("you're on the first page")
 		return nil
@@ -64,14 +64,14 @@ func commandMapBack(param string, config *config) error {
 	return nil
 }
 
-func commandExplore(param string, config *config) error {
-	if param == "" {
-		return errors.New("need to provide a location area name")
+func commandExplore(config *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("You need to provide a location area name")
 	}
 
-	fmt.Printf("Exploring %s...\n", param)
+	fmt.Printf("Exploring %s...\n", args[0])
 
-	result, err := config.pokeApiClient.GetLocationAreaByName(param)
+	result, err := config.pokeApiClient.GetLocationAreaByName(args[0])
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func commandExplore(param string, config *config) error {
 type cliCommand struct {
 	name string
 	description string
-	callback func(string, *config) error
+	callback func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {

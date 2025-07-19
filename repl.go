@@ -32,16 +32,11 @@ func startRepl(config *config) {
 
 		command := cleaned[0]
 
-		var param string
-		if len(cleaned) > 1 {
-			param = cleaned[1]
-		}
-
 		supportedCommands := getCommands()
 
 		supportedCommand, ok := supportedCommands[command]
 		if ok {
-			err := supportedCommand.callback(param, config)
+			err := supportedCommand.callback(config, cleaned[1:]...)
 			if err != nil {
 				fmt.Printf("Error executing command '%s': %v\n", supportedCommand.name, err)
 			}
