@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -69,9 +70,11 @@ func commandExplore(config *config, args ...string) error {
 		return errors.New("You need to provide a location area name")
 	}
 
-	fmt.Printf("Exploring %s...\n", args[0])
+	locationName := args[0]
 
-	result, err := config.pokeApiClient.GetLocationAreaByName(args[0])
+	fmt.Printf("Exploring %s...\n", locationName)
+
+	result, err := config.pokeApiClient.GetLocationAreaByName(locationName)
 	if err != nil {
 		return err
 	}
@@ -80,6 +83,33 @@ func commandExplore(config *config, args ...string) error {
 	for _, encounter := range result.PokemonEncounters {
 		fmt.Printf(" - %s\n", encounter.Pokemon.Name)
 	}
+	return nil
+}
+
+func commandCatch(config *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("You need to provide a Pokemon name")
+	}
+
+	pokemonName := args[0]
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+
+	pokemon, err := config.pokeApiClient.GetPokemonByName(pokemonName)
+	if err != nil {
+		return err
+	}
+
+	chanceToCatch := rand.Intn(pokemon.BaseExperience/10 + 5)
+
+	if chanceToCatch != 1 {
+		fmt.Printf("%s escaped!\n", pokemonName)
+		return nil
+	}
+
+	config.catchedPokemons[pokemonName] = *pokemon
+	fmt.Printf("%s was caught!\n", pokemonName)
+
 	return nil
 }
 
@@ -116,6 +146,11 @@ func getCommands() map[string]cliCommand {
 			name: "explore",
 			description: "Lists all the Pokémon in a given location area.",
 			callback: commandExplore,
+		},
+		"catch": {
+			name: "catch",
+			description: "It takes as a parameter a Pokemon name and attempts to catch it.",
+			callback: commandCatch,
 		},
 	}
 }
