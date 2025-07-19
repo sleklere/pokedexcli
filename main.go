@@ -1,7 +1,7 @@
 package main
 
 import (
-	cache "github.com/sleklere/pokedexcli/internal/pokecache"
+	api "github.com/sleklere/pokedexcli/internal/pokeapi"
 	"strings"
 	"time"
 )
@@ -11,9 +11,10 @@ func cleanInput(text string) []string {
 }
 
 func main() {
-	apiConfig := &config{}
+	client := api.NewClient(5*time.Second, 5*time.Second)
+	apiConfig := &config{
+		pokeApiClient: client,
+	}
 
-	cache := cache.NewCache(5*time.Second)
-
-	startRepl(apiConfig, cache)
+	startRepl(apiConfig)
 }
