@@ -141,6 +141,16 @@ func commandInspect(config *config, args ...string) error {
 	return nil
 }
 
+func commandPokedex(config *config, args ...string) error {
+	fmt.Println("Your pokedex:")
+
+	for _, value := range config.catchedPokemons {
+		fmt.Printf("	- %s\n", value.Name)
+	}
+
+	return nil
+}
+
 
 type cliCommand struct {
 	name string
@@ -184,6 +194,11 @@ func getCommands() map[string]cliCommand {
 			name: "inspect",
 			description: "It takes the name of a Pokemon and prints the name, height, weight, stats and type(s).",
 			callback: commandInspect,
+		},
+		"pokedex": {
+			name: "pokedex",
+			description: "It takes no arguments but prints a list of all the names of the Pokemon the user has caught",
+			callback: commandPokedex,
 		},
 	}
 }
