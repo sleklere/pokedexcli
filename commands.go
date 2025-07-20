@@ -113,6 +113,34 @@ func commandCatch(config *config, args ...string) error {
 	return nil
 }
 
+func commandInspect(config *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("Please enter a pokemon name")
+	}
+
+	pokemonName := args[0]
+
+	pokemon, ok := config.catchedPokemons[pokemonName]
+	if !ok {
+		fmt.Println("you have not caught that pokemon")
+		return nil
+	}
+
+	fmt.Printf("Name: %v\n", pokemon.Name)
+	fmt.Printf("Height: %v\n", pokemon.Height)
+	fmt.Printf("Weight: %v\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("	-%s: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, pokemonType := range pokemon.Types {
+		fmt.Printf("	-%s\n", pokemonType.Type.Name)
+	}
+
+	return nil
+}
+
 
 type cliCommand struct {
 	name string
@@ -151,6 +179,11 @@ func getCommands() map[string]cliCommand {
 			name: "catch",
 			description: "It takes as a parameter a Pokemon name and attempts to catch it.",
 			callback: commandCatch,
+		},
+		"inspect": {
+			name: "inspect",
+			description: "It takes the name of a Pokemon and prints the name, height, weight, stats and type(s).",
+			callback: commandInspect,
 		},
 	}
 }
